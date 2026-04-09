@@ -1,0 +1,407 @@
+---
+title: 'BIOS 333 — Week 1 In‑Class: Getting Comfortable with ggplot2'
+author: "Lizbeth Macias"
+date: "`r format(Sys.Date(), '01 29, 26')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    theme: readable
+  pdf_document:
+    toc: true
+    toc_depth: '2'
+---
+
+## Goals for today (read this first)
+
+By the end of class you should be able to:
+
+- Build a plot from scratch using `ggplot()` + layers (geoms).
+- Map variables to aesthetics (`x`, `y`, `color`, `size`, `shape`, `alpha`).
+- Debug common problems by *breaking* a plot on purpose and then fixing it.
+- Use themes and labels to improve readability.
+- Write short, clear notes that interpret what your code did and what your plot shows.
+
+**Important:** This is an in‑class assignment. You must fill in the **TODO** sections, knit to HTML, and submit the HTML to Blackboard.
+
+## Required reading (for context, not a quiz)
+
+You should have read (or skimmed) these before class:
+
+- Color basics: https://clauswilke.com/dataviz/color-basics.html  
+- Aesthetic mapping: https://clauswilke.com/dataviz/aesthetic-mapping.html  
+- Coordinate systems & axes: https://clauswilke.com/dataviz/coordinate-systems-axes.html  
+- Healy (socviz) make a plot: https://socviz.co/makeplot.html#makeplot  
+
+---
+
+## Setup
+
+### 0) Your notes (required)
+
+In 3–5 bullet points, write what you think ggplot2 is doing when you make a plot.
+
+**TODO (write your notes below):**
+
+- You tell ggplot which variables go where by mapping them to aesthetics like color, size, etc.
+- Themes and labels make the plot easier to read, without changing the data itself.
+- ggplot2 builds a plot in layers: you start with the data, then add pieces (like points or lines) one layer at a time.
+
+### 1) Packages
+
+We will use `ggplot2` and a built‑in dataset (`mtcars`) so there is **no data download** needed.
+
+```{r setup, message=FALSE, warning=FALSE}
+# If you are running this on a computer that does NOT have ggplot2 installed yet,
+# uncomment the next line once:
+# install.packages("ggplot2")
+
+library(ggplot2)
+
+# Optional: for nicer data manipulation later (not required today)
+# install.packages("dplyr")
+# library(dplyr)
+```
+
+### 2) Load / inspect the dataset
+
+`mtcars` is built into R. Let's look at it.
+
+```{r}
+# TODO: Run these lines and interpret what you see.
+
+# View the first few rows
+# head(mtcars)
+
+# Look at column names
+# names(mtcars)
+
+# Get a quick summary
+# summary(mtcars)
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** What does one row represent? What are 2 variables you think might relate to fuel efficiency (`mpg`)?
+
+- One row represents one car are its characteristics measured since each column shows a unique feature like mpg or weight. 
+- 2 variables I think might relate to fuel efficiency are weight (wt) since the heavier a vehicle is, the more fuel/gas it intakes, and size of the car since the larger the car, more fuel it needs.
+---
+
+## Part A — The smallest possible ggplot
+
+### 3) Start with a blank ggplot object
+
+
+```{r}
+# TODO: Create a ggplot object that uses mtcars as the data.
+# Hint: ggplot(data = mtcars)
+
+# NOTE: removed hashtags in both p to run function properly. R ignores action if hashtag is in front of it.
+p <- ggplot(data = mtcars)
+p
+```
+
+**Interpretation (1–2 sentences):**  
+**TODO:** Why does this not show a plot yet?
+
+- This plot does not show a plot yet since no data has been given or instructed even though the command ran with no errors. We need to specify it.
+
+### 4) Add points (a first geom)
+
+```{r}
+# TODO: Add a scatterplot layer with geom_point()
+# Requirements:
+# - x axis: wt
+# - y axis: mpg
+# Note: removed hashtags on line ggplot and geom_point
+
+ggplot(data = mtcars, aes(x = wt, y = mpg)) +
+geom_point()
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** Describe the relationship between weight (`wt`) and miles per gallon (`mpg`). Is it positive or negative? Strong or weak?
+
+- The relationship between wt and mpg is negative because as a car’s weight increases, fuel efficiency tends to decrease when observing the graph. Additionally, the points show a clear downward trend, showing a strong trend. 
+---
+
+## Part B — Aesthetics: map vs set
+3 Part B
+### 5) Map a variable to color
+Note color point by number of cyinders
+
+```{r}
+# TODO: Color points by number of cylinders (cyl)
+# Hint: put color = cyl inside aes(...)
+# Note: removed hashtages in ggplot and geom so that R doesn't ignore command.
+ ggplot(mtcars, aes(x = wt, y = mpg, color = cyl)) +
+   geom_point()
+#Note: make all points one color
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** What does "mapping" mean here? What does the legend represent?
+- mapping means assigning a variable from the data (cyl) to create a an aesthetic for (color). Each point on the graph colors are determined by how many cylinders a particular car has. The legend shows which color goes to cylinder group it belongs in. 
+ 
+
+### 6) Set a constant color (NOT mapped)
+
+```{r}
+# TODO: Make points blue (or any single color you like) BUT do not create a legend.
+# Hint: put color = "blue" outside aes(...)
+# Note: removed hashtags to make all plots all blue
+ ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(color = "blue")
+```
+
+**Interpretation (1–2 sentences):**  
+**TODO:** Explain why the previous plot had a legend but this one does not.
+- The previous plot had a legend because color was mapped to a variable (cyl) inside aes(), so ggplot needed a legend to explain the different colors. 
+- In this plot, the color is set to a single value being ("blue") that is outside aes(), so it does not represent any data. 
+### 7) Try other aesthetics
+
+Choose ONE:
+- Map `size` to `hp`, OR
+- Map `shape` to `gear`, OR
+- Map `alpha` to `disp`
+
+```{r}
+# TODO: Make points green (or any single color you like) BUT do not create a legend.
+# Hint: put color = "green" outside aes(...)
+
+ ggplot(mtcars, aes(x = wt, y = mpg, color = cyl, shape = factor ( gear ))) + geom_point()
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** Was your chosen aesthetic helpful or confusing? Why?
+- My chosen aesthetic was confusing since changing the shape to gear makes it visually difficult to understand what the data is interpreting even though a legend is present.
+---
+
+## Part C — Break it on purpose, then fix it
+
+### 8) "Object not found" in ggplot2
+
+Run the code below **as is**. You should get an error.
+
+```{r}
+# DO NOT FIX THIS LINE YET — run it first and read the error.
+
+#Note: added hashtags since it should give you an error but idn't want to have issues when knitting
+
+# ggplot(mtcars, aes(x = weight, y = mpg)) +
+#  geom_point()
+```
+
+**TODO:** Copy/paste the exact error message here:
+
+Error in `geom_point()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error:
+! object 'weight' not found
+Run `rlang::last_trace()` to see where the error occurred.
+> 
+
+Now fix it.
+
+```{r}
+# TODO: Fix the plot by using the correct column name.
+# Hint: check names(mtcars)
+# Note: changed weight to x= wt because it doesn't know weight
+# Your fixed code here
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point()
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** What did the error *mean* in plain English? How did you diagnose it?
+
+- The "error" means that I asked R to use a variable/function, that it cannot locate in its current memory, in this case it couldn't locate (wt) since it was written as "weight".
+---
+
+## Part D — Layers: add a trend line, then modify it
+
+### 9) Add a smooth trend
+Note: removed hashtags in lines 218 to 220
+```{r}
+# TODO: Add geom_smooth() to your scatterplot of wt vs mpg
+# Hint: add a new layer with +
+# Note: a solid line and a surrounding grey area usually represent a regression line and its confidence interval produced by geom_smooth() function. 
+ ggplot(mtcars, aes(wt, mpg)) +
+   geom_point() +
+   geom_smooth()
+```
+
+### 10) Make the smooth line a *linear model*
+
+```{r}
+# TODO: Modify geom_smooth so it fits a straight line.
+# Hint: geom_smooth(method = "lm", se = FALSE)
+# Note: what does se: false do? turns confidence intervals off
+# Note: added new code for smooth linear line
+# Your code here
+ggplot(mtcars, aes (x = wt, y= mpg)) +
+   geom_point() +
+   geom_smooth(method ="lm", se = FALSE)
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** What does `se = FALSE` change? Why might you turn it off?
+- 'se = FALSE' removes the shaded confidence interval ribbon around the regression line to make the plot look cleaner visually.
+---
+
+## Part E — Facets: small multiples
+
+### 11) Compare groups with facets
+
+```{r}
+# TODO: Facet by cylinders (cyl)
+# Hint: + facet_wrap(~ cyl)
+# Note: edit all this
+# Your code here
+ggplot(mtcars, aes(wt, mpg, color = factor (cyl), shape = factor (gear))) + geom_point() +
+   geom_smooth(method ="lm", se = FALSE) 
+   facet_wrap(~cyl)
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** In what way is faceting different from coloring? Which is clearer here?
+- faceting allows to plot in grids to show a different subset of data in a specific category.
+- coloring is more clearer when showing differences and direct comparisons while faceting prevents overlap of data points.
+---
+
+## Part F — Labels, themes, and coordinate systems
+
+### 12) Make it readable (labels + theme)
+
+```{r}
+# TODO: Improve your plot.
+# Requirements:
+# - Add a title
+# - Label x and y axes with words (not just wt/mpg)
+# - Use theme_minimal() OR theme_classic()
+
+# Your code here
+   ggplot(mtcars, aes(wt, mpg, color = factor(cyl), shape = factor(gear))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ cyl) +
+  labs(
+    title = "Fuel Efficiency vs Car Weight by Cylinder",
+    x = "Car Weight (1000 lbs)",
+    y = "Miles per Gallon (mpg)"
+  ) +
+  theme_minimal()
+   
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** What design choices did you make and why?
+- Design choices I made to this graph is include a title on the top, title on both (x and y) axis. 
+- This helped make the graph more visually appealing but also include the necessary information it needed to understand what the plot is interpreting.
+### 13) Coordinate systems: zoom vs change scale
+
+**A. Zoom (keep the data, change what you *see*)**
+
+```{r}
+# TODO: Add coord_cartesian(ylim = c(10, 35)) (or similar)
+# Use your favorite plot from above.
+# Note: addded coord_cartesian as extended function in chunk. Not really sure what it did.
+# Your code here
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl), shape = factor(gear))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ cyl) +
+  labs(
+    title = "Fuel Efficiency vs Car Weight by Cylinder",
+    x = "Car Weight (1000 lbs)",
+    y = "Miles per Gallon (mpg)"
+  ) +
+  coord_cartesian(ylim = c(10, 35)) +
+  theme_minimal()
+```
+
+**B. Filter (remove data before plotting)**
+
+```{r}
+# TODO: Create a filtered dataset that keeps only cars with mpg <= 35 (or similar),
+# then plot it. You may use base R or dplyr.
+
+# Option 1 (base R):
+# mt_small <- mtcars[mtcars$mpg <= 35, ]
+
+# Option 2 (dplyr):
+# mt_small <- mtcars %>% filter(mpg <= 35)
+# Note: option 1: 32 observations empty_small of 11 variables
+# Note: add $
+# Your code here
+# Note: did option 1
+
+ggplot(mtcars, aes(wt, mpg, color = factor(cyl), shape = factor(gear))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ cyl) +
+  labs(
+    title = "Fuel Efficiency vs Car Weight by Cylinder",
+    x = "Car Weight (1000 lbs)",
+    y = "Miles per Gallon (mpg)"
+  ) +
+  coord_cartesian(ylim = c(10, 35)) +
+  theme_minimal()
+
+  mt_small <- mtcars[mtcars$mpg <= 35, ]
+
+ggplot(mt_small, aes(wt, mpg)) +
+  geom_point()
+
+```
+
+**Interpretation (3–5 sentences):**  
+**TODO:** Explain the difference between *zooming* with `coord_cartesian()` and *filtering* the data first. Why does this matter ethically?
+- "Zooming" with coord_cartesian() restricts how we view the window of a plot while keeping the entire dataset intact
+- It acts as a magnifier. Examples could be trends, smoothers, etc. - "filtering" data first removes data points outside the specified range before plotting
+- This can change the statistical summaries and visual interpretations of the graphs created. This matters ethically because filtering unaware can lead to the removal of outliers or contextual information.
+
+---
+
+## Part G — Final challenge (choose one)
+
+Pick ONE challenge below and complete it. Your goal is to show you can build a plot, break it, and rebuild it.
+
+### Option 1: Boxplot + jitter
+Note: add boxplot and jitter piece
+Note: geombox + jitter code
+Note: x=cylinder
+y=mpg
+Note: not doing geom or facet
+Make a boxplot of `mpg` by `cyl`, then overlay jittered points.
+# Note: included geom_boxplot and geom_jitter
+```{r}
+# TODO: Your code here
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.3)
+```
+
+**Interpretation (2–4 sentences):**  
+**TODO:** What does the boxplot summarize that the points do not (or vice versa)?
+- Boxplot summarizes and shows points in the median, quartiles and interquartile range (IQR).
+- In doing so, it provides immediate visual cues for overall spread and skewness, which can be difficult to tell without it.
+
+---
+
+## Turn‑in checklist
+
+Before you submit:
+
+- [ ] You knitted to **HTML** with no errors.
+- [ ] Every **TODO** section has either code or prose.
+- [ ] Your plots appear in the knitted HTML.
+- [ ] Your interpretations are in your own words.
+
+## Session info (required)
+
+```{r}
+sessionInfo()
+```
