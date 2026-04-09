@@ -1,0 +1,359 @@
+---
+title: "BIOS 333 — Week 4 In-Class Assignment: Tidyverse + dplyr"
+author: "Lizbeth Macias"
+date: "`r format(Sys.Date(), '02 05, 2026')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: readable
+---
+
+## What you will submit
+
+Knit this file to **HTML** and submit the **HTML** on Blackboard.
+
+You are expected to:
+
+- run all code chunks (no red errors)
+- fill in the **TODO** sections (code + short written answers)
+- make your plots match the expected output *as closely as possible*
+
+## Today’s goals (90 minutes)
+
+1) Install + load the **tidyverse**  
+2) Import data using `readr::read_csv()`  
+3) Filter, select/rename, mutate, arrange, group, summarize using **dplyr**  
+4) Learn the **pipe** operator (`%>%` and `|>`)  
+5) Connect a dplyr pipeline directly into **ggplot2**  
+6) Create two “amounts” graphics: a **lollipop (dot) plot** and a **heatmap**
+
+---
+
+## 0) Setup: install and load packages
+
+> If you have never installed tidyverse before, you **must** install it once.
+> Installing happens in the **Console**; loading happens in your **R Markdown**.
+
+```{r setup, message=FALSE, warning=FALSE}
+# Install packages (run ONCE in the Console, not every time you knit)
+ #install.packages("tidyverse")
+
+#Note: installed tidyverse and returned hashtag back. console does read message on line 50
+# Load tidyverse (this loads ggplot2 + dplyr + readr + tibble + tidyr + stringr + forcats, etc.)
+library(tidyverse)
+```
+
+### Quick note on “conflicts”
+When you load tidyverse, you may see messages like:
+
+- `dplyr::filter() masks stats::filter()`
+
+That’s normal. It means **two packages have a function with the same name**.
+In this course, we want **dplyr's** version, so we use `filter()` normally.
+
+---
+
+## 1) Why tidyverse + dplyr?
+
+Tidyverse is a collection of packages designed to work together. In this course we use it because:
+
+- it makes data cleaning steps **explicit** (reproducible)
+- it helps keep data in a consistent, “tidy” structure
+- it integrates naturally with ggplot2
+
+---
+
+## 2) The pipe operator: `%>%` and `|>`
+
+### What does a pipe do?
+
+A pipe takes the result of one step and passes it into the next step.
+
+- `%>%` is the tidyverse pipe (from **magrittr**, included with tidyverse)
+- `|>` is the base R pipe (works in modern R versions)
+
+Think: “then… then… then…”
+
+```{r}
+# Example: take pi, then take sin, then take cos
+pi %>%
+  sin() %>%
+  cos()
+```
+
+### Your turn
+
+**TODO:** Write the same computation using the base R pipe `|>`.
+
+```{r}
+# TODO: replace ??? so this runs
+pi |>
+  sin() |>
+  cos()
+```
+
+**TODO (1–2 sentences):** When might a pipe be useful compared to nested functions like `cos(sin(pi))`?
+
+> Answer here:
+Pipe can be useful compared to nested functions like 'cos(sin(pi)) because it makes it easier to read and understand what the types of conditions are being asked, especially when your running multiple conditions.
+---
+
+## 3) Importing data with readr
+
+A lot of “data wrangling” begins with importing a `.csv`.
+
+To keep this exercise self-contained, we will **create** a tiny CSV file and then import it.
+
+```{r}
+toy_path <- "toy_animals.csv"
+
+# Note: ran chunk 
+toy_text <- "
+animal_type,weight,site
+cat,4.1,North
+cat,3.7,North
+dog,20.0,North
+dog,18.5,South
+dog,22.2,South
+lizard,0.2,South
+"
+
+writeLines(trimws(toy_text), con = toy_path)
+
+animals <- readr::read_csv(toy_path, show_col_types = FALSE)
+animals
+```
+
+### Inspecting data: `glimpse()`
+
+`glimpse()` gives a compact overview: number of rows/columns, column names, and types.
+
+```{r}
+glimpse(animals)
+```
+
+**TODO (1–2 sentences):** Why is it useful to look at column types (e.g., `<dbl>`, `<chr>`) before plotting?
+
+> Answer here:
+It is useful to look at column types before plotting because it helps make sure that mapping variables like color and axis's (x,y) in visual asthetics work correctly to create the desired plot. 
+---
+
+## 4) Core dplyr verbs (what they do and when you’d use them)
+
+You will use these constantly:
+
+- `filter()` — keep rows that meet a condition (subsetting)
+- `select()` — keep, reorder, and rename columns (focus on what matters)
+- `mutate()` — create new columns (features)
+- `arrange()` — reorder rows (sorting)
+- `group_by()` + `summarize()` — compute summaries by group (counts, means, etc.)
+- `count()` — a shortcut for `group_by()` + `summarize(n = n())`
+
+We’ll practice each one.
+
+---
+
+## 5) Filtering rows with `filter()`
+
+```{r}
+# Keep only dogs
+animals_dogs <- animals %>%
+  filter(animal_type == "dog")
+
+animals_dogs
+```
+
+**TODO:** Filter the dataset to include only observations from `site == "South"`.
+
+```{r}
+# TODO: write code that creates animals_south
+animals_south <- animals %>%
+  filter(site == 'south')
+#Note: in line 172 added (site == 'south') to indicate animals in the south
+animals_south
+```
+
+---
+
+## 6) Selecting and renaming columns with `select()`
+
+```{r}
+# Keep only animal_type and weight
+animals_small <- animals %>%
+  select(animal_type, weight)
+# Note: in line 184 added animal_type, weight to indicate the weight of a specific animal
+animals_small
+```
+
+**TODO:** Use `select()` to rename `animal_type` to `type` (keep `weight` too).
+
+```{r}
+# TODO: create animals_renamed
+animals_renamed <- animals %>%
+  select(type = animal_type, weight)
+
+animals_renamed
+```
+
+---
+
+## 7) Creating new columns with `mutate()`
+
+`mutate()` is used when you want a new variable derived from existing variables.
+
+Example: convert weight from kg to grams (fake example).
+
+```{r}
+animals %>%
+  mutate(weight_g = weight * 1000)
+```
+
+**TODO:** Create a new column `heavy` that is TRUE when `weight > 10` and FALSE otherwise.
+
+```{r}
+# TODO: create animals_flagged
+animals_flagged <- animals %>%
+  mutate(heavy = weight > 10)
+#Note: in line 217, elaborated more specifically of the weight being greater than 10 is considered heavy
+animals_flagged
+```
+
+---
+
+## 8) Sorting rows with `arrange()`
+
+```{r}
+animals %>%
+  arrange(weight)
+```
+
+**TODO:** Arrange animals from heaviest to lightest.
+
+```{r}
+animals %>%
+  arrange(desc(weight))
+# Note: on line 235 it explains weight going from heaviest to lightest (desc(weight)) means in descending in weight order
+```
+
+---
+
+## 9) Grouped summaries: `group_by()` + `summarize()` (and `count()`)
+
+### Example: average weight by site
+
+```{r}
+animals %>%
+  group_by(site) %>%
+  summarize(mean_weight = mean(weight))
+```
+
+**TODO:** Compute the number of rows per `animal_type` using `count()`.
+
+```{r}
+# TODO: create animal_counts
+animal_counts <- animals %>%
+  count(animal_type)
+# Note: on line 256 explained specifically to count the number of different type of animals that were obtained from the data.
+animal_counts
+```
+
+---
+
+## 10) How dplyr integrates with ggplot2
+
+The key idea: you can pipe a dataset into `ggplot()`.
+
+### A) Lollipop (dot) plot: counts by animal_type
+
+```{r}
+animal_counts %>%
+  ggplot(aes(x = n, y = animal_type)) +
+  geom_segment(aes(x = 0, xend = n, yend = animal_type)) +
+  geom_point(size = 3) +
+  labs(x = "Count", y = NULL, title = "Counts by animal type") +
+  theme_minimal()
+```
+
+**TODO (1–2 sentences):** Why might a lollipop/dot plot be preferable to a bar plot for “amounts”?
+
+> Answer here:
+A lollipop/dot plot may be preferable to a bar plot for "amounts" because its makes comparing easier/ clearer to read and understand especially when there are multiple categories/data to interpret. Additionally it makes it more visually appealing because a bar graph may exaggerate more than what it is because it takes so much space (a lot going on).
+---
+
+## 11) A realistic dataset: `mpg` from ggplot2
+
+The `mpg` dataset comes with ggplot2.
+
+```{r}
+mpg <- ggplot2::mpg
+glimpse(mpg)
+```
+
+### A) Filter + select + mutate, then plot
+
+Goal: compare highway mileage for cars with 4 vs 6 cylinders.
+
+**TODO:** Fill in the pipeline.
+
+```{r}
+mpg %>%
+  # TODO: keep only cyl 4 or 6
+  filter(cyl %in% c(4,6)) %>%
+  # TODO: keep only manufacturer, model, cyl, hwy, class
+  select(manufacturer, model, cyl, hwy, class) %>%
+  # TODO: create a new column: efficiency = hwy / cyl
+  mutate(efficiency = hwy/cyl ) %>%
+  ggplot(aes(x = cyl, y = hwy)) +
+  geom_point(alpha = 0.6, position = position_jitter(width = 0.1, height = 0)) +
+  labs(x = "Cylinders", y = "Highway MPG", title = "Highway MPG by cylinder count") +
+  theme_minimal()
+# Note: need to fix error in line 302 (not sure what i'm doing wrong)
+# Note: fixed line 302. included %in% which means its an operator that is used to identify is elements from one vector is there, which they were. 
+```
+
+---
+
+## 12) Heatmap: counts by manufacturer and class
+
+Heatmaps are useful when exact values are less important than **patterns**.
+
+We’ll count how many cars each manufacturer has in each class, then plot a heatmap.
+
+```{r}
+mpg_counts <- mpg %>%
+  count(manufacturer, class)
+
+mpg_counts
+```
+
+**TODO:** Make a heatmap with `geom_tile()`.
+
+Hints:
+- `aes(x = class, y = manufacturer, fill = n)`
+- use `theme_minimal()`
+- rotate x-axis labels using `theme(axis.text.x = element_text(angle = 45, hjust = 1))`
+
+```{r}
+# TODO: your heatmap here
+mpg_counts %>%
+  ggplot(aes(x = class, y= manufacturer, fill = n)) +
+  geom_tile() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1)) +
+  labs(x = NULL, y = NULL, fill = "Count", title = "Vehicle counts by manufacturer and class")
+#Note: made an axis.text command to let r know that I want to use a heat map with specific angle and coordinate.
+```
+
+**TODO (2–3 sentences):** When is a heatmap a good idea? When is it a bad idea?
+
+> Answer here:
+A heatmap is a good idea when you want to identify and locate patterns or trendlines across a certain region, area, or even distict groups; highlighting characteristics rather than specific groups or values. Heatmaps wouldn't be that great of a choice if your working with specific numbers and data that requires a more on-point a reliable table.
+---
+
+## 13) Checklist before you submit
+
+- [ ] You knitted to HTML successfully
+- [ ] All TODO sections are completed
+- [ ] Your plots appear in the HTML
+- [ ] Your answers are written in complete sentences
